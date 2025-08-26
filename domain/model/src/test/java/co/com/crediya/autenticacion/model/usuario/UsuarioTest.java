@@ -1,6 +1,5 @@
 package co.com.crediya.autenticacion.model.usuario;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,23 +46,17 @@ class UsuarioTest {
         assertThat(usuario.telefono()).isEqualTo(TEST_TELEFONO);
         assertThat(usuario.rolId()).isEqualTo(TEST_ROL_ID);
         assertThat(usuario.salarioBase()).isEqualTo(TEST_SALARIO);
-        assertThat(usuario.estado()).isEqualTo(EstadoUsuario.ACTIVO);
-        assertThat(usuario.fechaCreacion()).isNotNull();
-        assertThat(usuario.version()).isEqualTo(0L);
     }
     
     @Test
     @DisplayName("Debería crear un usuario desde datos existentes")
     void deberiaCrearUsuarioDesdeDatosExistentes() {
         // Given
-        LocalDateTime fechaCreacion = LocalDateTime.now();
-        long version = 5L;
-        
+
         // When
         Usuario usuario = Usuario.from(TEST_USUARIO_ID, TEST_NOMBRE, TEST_APELLIDO,
                                       TEST_EMAIL, TEST_DOCUMENTO, TEST_TELEFONO,
-                                      TEST_ROL_ID, TEST_SALARIO, EstadoUsuario.ACTIVO,
-                                      fechaCreacion, version);
+                                      TEST_ROL_ID, TEST_SALARIO);
         
         // Then
         assertThat(usuario.id()).isEqualTo(TEST_USUARIO_ID);
@@ -74,9 +67,6 @@ class UsuarioTest {
         assertThat(usuario.telefono()).isEqualTo(TEST_TELEFONO);
         assertThat(usuario.rolId()).isEqualTo(TEST_ROL_ID);
         assertThat(usuario.salarioBase()).isEqualTo(TEST_SALARIO);
-        assertThat(usuario.estado()).isEqualTo(EstadoUsuario.ACTIVO);
-        assertThat(usuario.fechaCreacion()).isEqualTo(fechaCreacion);
-        assertThat(usuario.version()).isEqualTo(version);
     }
     
     @Test
@@ -100,8 +90,7 @@ class UsuarioTest {
         assertThat(usuarioActualizado.documentoIdentidad()).isEqualTo(TEST_DOCUMENTO);
         assertThat(usuarioActualizado.rolId()).isEqualTo(TEST_ROL_ID);
         assertThat(usuarioActualizado.salarioBase()).isEqualTo(TEST_SALARIO);
-        assertThat(usuarioActualizado.estado()).isEqualTo(EstadoUsuario.ACTIVO);
-        
+
         // Verificar que el usuario original no cambió (inmutabilidad)
         assertThat(usuario.telefono()).isEqualTo(TEST_TELEFONO);
     }
@@ -127,105 +116,9 @@ class UsuarioTest {
         assertThat(usuarioActualizado.documentoIdentidad()).isEqualTo(TEST_DOCUMENTO);
         assertThat(usuarioActualizado.telefono()).isEqualTo(TEST_TELEFONO);
         assertThat(usuarioActualizado.rolId()).isEqualTo(TEST_ROL_ID);
-        assertThat(usuarioActualizado.estado()).isEqualTo(EstadoUsuario.ACTIVO);
-        
+
         // Verificar que el usuario original no cambió (inmutabilidad)
         assertThat(usuario.salarioBase()).isEqualTo(TEST_SALARIO);
-    }
-    
-    @Test
-    @DisplayName("Debería cambiar el estado del usuario")
-    void deberiaCambiarEstado() {
-        // Given
-        Usuario usuario = Usuario.create(TEST_USUARIO_ID, TEST_NOMBRE, TEST_APELLIDO,
-                                        TEST_EMAIL, TEST_DOCUMENTO, TEST_TELEFONO,
-                                        TEST_ROL_ID, TEST_SALARIO);
-        
-        // When
-        Usuario usuarioInactivo = usuario.cambiarEstado(EstadoUsuario.INACTIVO);
-        
-        // Then
-        assertThat(usuarioInactivo.id()).isEqualTo(TEST_USUARIO_ID);
-        assertThat(usuarioInactivo.estado()).isEqualTo(EstadoUsuario.INACTIVO);
-        assertThat(usuarioInactivo.nombre()).isEqualTo(TEST_NOMBRE);
-        assertThat(usuarioInactivo.apellido()).isEqualTo(TEST_APELLIDO);
-        assertThat(usuarioInactivo.email()).isEqualTo(TEST_EMAIL);
-        assertThat(usuarioInactivo.documentoIdentidad()).isEqualTo(TEST_DOCUMENTO);
-        assertThat(usuarioInactivo.telefono()).isEqualTo(TEST_TELEFONO);
-        assertThat(usuarioInactivo.rolId()).isEqualTo(TEST_ROL_ID);
-        assertThat(usuarioInactivo.salarioBase()).isEqualTo(TEST_SALARIO);
-        
-        // Verificar que el usuario original no cambió (inmutabilidad)
-        assertThat(usuario.estado()).isEqualTo(EstadoUsuario.ACTIVO);
-    }
-    
-    @Test
-    @DisplayName("Debería marcar el usuario como persistido con nueva versión")
-    void deberiaMarcarComoPersistido() {
-        // Given
-        Usuario usuario = Usuario.create(TEST_USUARIO_ID, TEST_NOMBRE, TEST_APELLIDO,
-                                        TEST_EMAIL, TEST_DOCUMENTO, TEST_TELEFONO,
-                                        TEST_ROL_ID, TEST_SALARIO);
-        long nuevaVersion = 1L;
-        
-        // When
-        Usuario usuarioPersistido = usuario.markPersisted(nuevaVersion);
-        
-        // Then
-        assertThat(usuarioPersistido.id()).isEqualTo(TEST_USUARIO_ID);
-        assertThat(usuarioPersistido.version()).isEqualTo(nuevaVersion);
-        assertThat(usuarioPersistido.nombre()).isEqualTo(TEST_NOMBRE);
-        assertThat(usuarioPersistido.apellido()).isEqualTo(TEST_APELLIDO);
-        assertThat(usuarioPersistido.email()).isEqualTo(TEST_EMAIL);
-        assertThat(usuarioPersistido.documentoIdentidad()).isEqualTo(TEST_DOCUMENTO);
-        assertThat(usuarioPersistido.telefono()).isEqualTo(TEST_TELEFONO);
-        assertThat(usuarioPersistido.rolId()).isEqualTo(TEST_ROL_ID);
-        assertThat(usuarioPersistido.salarioBase()).isEqualTo(TEST_SALARIO);
-        assertThat(usuarioPersistido.estado()).isEqualTo(EstadoUsuario.ACTIVO);
-    }
-    
-    @Test
-    @DisplayName("Debería lanzar excepción al marcar como persistido con versión inválida")
-    void deberiaLanzarExcepcionConVersionInvalida() {
-        // Given
-        Usuario usuario = Usuario.create(TEST_USUARIO_ID, TEST_NOMBRE, TEST_APELLIDO,
-                                        TEST_EMAIL, TEST_DOCUMENTO, TEST_TELEFONO,
-                                        TEST_ROL_ID, TEST_SALARIO);
-        
-        // When & Then
-        assertThatThrownBy(() -> usuario.markPersisted(0L))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("La nueva versión debe ser mayor que la actual");
-    }
-    
-    @Test
-    @DisplayName("Debería verificar si el usuario está activo")
-    void deberiaVerificarSiEstaActivo() {
-        // Given
-        Usuario usuarioActivo = Usuario.create(TEST_USUARIO_ID, TEST_NOMBRE, TEST_APELLIDO,
-                                              TEST_EMAIL, TEST_DOCUMENTO, TEST_TELEFONO,
-                                              TEST_ROL_ID, TEST_SALARIO);
-        Usuario usuarioInactivo = usuarioActivo.cambiarEstado(EstadoUsuario.INACTIVO);
-        
-        // When & Then
-        assertThat(usuarioActivo.isActivo()).isTrue();
-        assertThat(usuarioInactivo.isActivo()).isFalse();
-    }
-    
-    @Test
-    @DisplayName("Debería verificar si el usuario puede autenticarse")
-    void deberiaVerificarSiPuedeAutenticarse() {
-        // Given
-        Usuario usuarioActivo = Usuario.create(TEST_USUARIO_ID, TEST_NOMBRE, TEST_APELLIDO,
-                                              TEST_EMAIL, TEST_DOCUMENTO, TEST_TELEFONO,
-                                              TEST_ROL_ID, TEST_SALARIO);
-        Usuario usuarioInactivo = usuarioActivo.cambiarEstado(EstadoUsuario.INACTIVO);
-        Usuario usuarioSuspendido = usuarioActivo.cambiarEstado(EstadoUsuario.SUSPENDIDO);
-        
-        // When & Then
-        assertThat(usuarioActivo.puedeAutenticarse()).isTrue();
-        assertThat(usuarioInactivo.puedeAutenticarse()).isFalse();
-        assertThat(usuarioSuspendido.puedeAutenticarse()).isFalse();
     }
     
     @Test
@@ -337,8 +230,6 @@ class UsuarioTest {
             .contains("apellido=Pérez")
             .contains("email=juan.perez@ejemplo.com")
             .contains("documentoIdentidad=12345678")
-            .contains("telefono=3001234567")
-            .contains("estado=ACTIVO")
-            .contains("version=0");
+            .contains("telefono=3001234567");
     }
 }

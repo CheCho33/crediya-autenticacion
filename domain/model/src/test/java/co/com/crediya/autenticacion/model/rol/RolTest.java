@@ -28,23 +28,18 @@ class RolTest {
         assertThat(rol.id()).isEqualTo(TEST_ROL_ID);
         assertThat(rol.nombre()).isEqualTo(TEST_NOMBRE);
         assertThat(rol.descripcion()).isEqualTo(TEST_DESCRIPCION);
-        assertThat(rol.version()).isEqualTo(0L);
     }
     
     @Test
     @DisplayName("Debería crear un rol desde datos existentes")
     void deberiaCrearRolDesdeDatosExistentes() {
-        // Given
-        long version = 5L;
-        
         // When
-        Rol rol = Rol.from(TEST_ROL_ID, TEST_NOMBRE, TEST_DESCRIPCION, version);
+        Rol rol = Rol.from(TEST_ROL_ID, TEST_NOMBRE, TEST_DESCRIPCION);
         
         // Then
         assertThat(rol.id()).isEqualTo(TEST_ROL_ID);
         assertThat(rol.nombre()).isEqualTo(TEST_NOMBRE);
         assertThat(rol.descripcion()).isEqualTo(TEST_DESCRIPCION);
-        assertThat(rol.version()).isEqualTo(version);
     }
     
     @Test
@@ -61,7 +56,6 @@ class RolTest {
         assertThat(rolActualizado.id()).isEqualTo(TEST_ROL_ID);
         assertThat(rolActualizado.nombre()).isEqualTo(TEST_NOMBRE);
         assertThat(rolActualizado.descripcion()).isEqualTo(nuevaDescripcion);
-        assertThat(rolActualizado.version()).isEqualTo(0L);
         
         // Verificar que el rol original no cambió (inmutabilidad)
         assertThat(rol.descripcion()).isEqualTo(TEST_DESCRIPCION);
@@ -81,39 +75,9 @@ class RolTest {
         assertThat(rolActualizado.id()).isEqualTo(TEST_ROL_ID);
         assertThat(rolActualizado.nombre()).isEqualTo(nuevoNombre);
         assertThat(rolActualizado.descripcion()).isEqualTo(TEST_DESCRIPCION);
-        assertThat(rolActualizado.version()).isEqualTo(0L);
         
         // Verificar que el rol original no cambió (inmutabilidad)
         assertThat(rol.nombre()).isEqualTo(TEST_NOMBRE);
-    }
-    
-    @Test
-    @DisplayName("Debería marcar el rol como persistido con nueva versión")
-    void deberiaMarcarComoPersistido() {
-        // Given
-        Rol rol = Rol.create(TEST_ROL_ID, TEST_NOMBRE, TEST_DESCRIPCION);
-        long nuevaVersion = 1L;
-        
-        // When
-        Rol rolPersistido = rol.markPersisted(nuevaVersion);
-        
-        // Then
-        assertThat(rolPersistido.id()).isEqualTo(TEST_ROL_ID);
-        assertThat(rolPersistido.nombre()).isEqualTo(TEST_NOMBRE);
-        assertThat(rolPersistido.descripcion()).isEqualTo(TEST_DESCRIPCION);
-        assertThat(rolPersistido.version()).isEqualTo(nuevaVersion);
-    }
-    
-    @Test
-    @DisplayName("Debería lanzar excepción al marcar como persistido con versión inválida")
-    void deberiaLanzarExcepcionConVersionInvalida() {
-        // Given
-        Rol rol = Rol.create(TEST_ROL_ID, TEST_NOMBRE, TEST_DESCRIPCION);
-        
-        // When & Then
-        assertThatThrownBy(() -> rol.markPersisted(0L))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("La nueva versión debe ser mayor que la actual");
     }
     
     @Test
@@ -219,15 +183,6 @@ class RolTest {
     }
     
     @Test
-    @DisplayName("Debería lanzar excepción al crear rol con versión negativa")
-    void deberiaLanzarExcepcionConVersionNegativa() {
-        // When & Then
-        assertThatThrownBy(() -> Rol.from(TEST_ROL_ID, TEST_NOMBRE, TEST_DESCRIPCION, -1L))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("La versión del rol no puede ser negativa");
-    }
-    
-    @Test
     @DisplayName("Debería ser igual a otro rol con el mismo ID")
     void deberiaSerIgualConMismoId() {
         // Given
@@ -253,7 +208,6 @@ class RolTest {
             .contains("Rol{")
             .contains("id=" + TEST_UUID)
             .contains("nombre=ADMIN")
-            .contains("descripcion=Rol de administrador del sistema")
-            .contains("version=0");
+            .contains("descripcion=Rol de administrador del sistema");
     }
 }

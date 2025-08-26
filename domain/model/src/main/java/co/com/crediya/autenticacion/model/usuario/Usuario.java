@@ -1,7 +1,5 @@
 package co.com.crediya.autenticacion.model.usuario;
 
-import java.time.LocalDateTime;
-
 import co.com.crediya.autenticacion.model.rol.RolId;
 import co.com.crediya.autenticacion.model.valueobjects.ApellidoUsuario;
 import co.com.crediya.autenticacion.model.valueobjects.DocumentoIdentidad;
@@ -30,10 +28,7 @@ public final class Usuario {
     private final Telefono telefono;
     private final RolId rolId;
     private final SalarioBase salarioBase;
-    private final EstadoUsuario estado;
-    private final LocalDateTime fechaCreacion;
-    private final long version;
-    
+
     /**
      * Constructor privado para crear una instancia de Usuario.
      * 
@@ -45,14 +40,10 @@ public final class Usuario {
      * @param telefono Teléfono del usuario
      * @param rolId Identificador del rol del usuario
      * @param salarioBase Salario base del usuario
-     * @param estado Estado del usuario
-     * @param fechaCreacion Fecha de creación del usuario
-     * @param version Versión para control de concurrencia optimista
      */
     private Usuario(UsuarioId id, NombreUsuario nombre, ApellidoUsuario apellido, 
                    Email email, DocumentoIdentidad documentoIdentidad, Telefono telefono,
-                   RolId rolId, SalarioBase salarioBase, EstadoUsuario estado,
-                   LocalDateTime fechaCreacion, long version) {
+                   RolId rolId, SalarioBase salarioBase) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -61,9 +52,6 @@ public final class Usuario {
         this.telefono = telefono;
         this.rolId = rolId;
         this.salarioBase = salarioBase;
-        this.estado = estado;
-        this.fechaCreacion = fechaCreacion;
-        this.version = version;
         validateInvariants();
     }
     
@@ -84,7 +72,7 @@ public final class Usuario {
                                Email email, DocumentoIdentidad documentoIdentidad, Telefono telefono,
                                RolId rolId, SalarioBase salarioBase) {
         return new Usuario(id, nombre, apellido, email, documentoIdentidad, telefono,
-                          rolId, salarioBase, EstadoUsuario.ACTIVO, LocalDateTime.now(), 0L);
+                          rolId, salarioBase);
     }
     
     /**
@@ -98,17 +86,12 @@ public final class Usuario {
      * @param telefono Teléfono del usuario
      * @param rolId Identificador del rol del usuario
      * @param salarioBase Salario base del usuario
-     * @param estado Estado del usuario
-     * @param fechaCreacion Fecha de creación del usuario
-     * @param version Versión actual
      * @return Nueva instancia de Usuario
      */
     public static Usuario from(UsuarioId id, NombreUsuario nombre, ApellidoUsuario apellido,
                              Email email, DocumentoIdentidad documentoIdentidad, Telefono telefono,
-                             RolId rolId, SalarioBase salarioBase, EstadoUsuario estado,
-                             LocalDateTime fechaCreacion, long version) {
-        return new Usuario(id, nombre, apellido, email, documentoIdentidad, telefono,
-                          rolId, salarioBase, estado, fechaCreacion, version);
+                             RolId rolId, SalarioBase salarioBase) {
+        return new Usuario(id, nombre, apellido, email, documentoIdentidad, telefono, rolId, salarioBase);
     }
     
     /**
@@ -120,7 +103,7 @@ public final class Usuario {
     public Usuario updateTelefono(Telefono nuevoTelefono) {
         return new Usuario(this.id, this.nombre, this.apellido, this.email,
                           this.documentoIdentidad, nuevoTelefono, this.rolId,
-                          this.salarioBase, this.estado, this.fechaCreacion, this.version);
+                          this.salarioBase);
     }
     
     /**
@@ -132,52 +115,7 @@ public final class Usuario {
     public Usuario updateSalarioBase(SalarioBase nuevoSalario) {
         return new Usuario(this.id, this.nombre, this.apellido, this.email,
                           this.documentoIdentidad, this.telefono, this.rolId,
-                          nuevoSalario, this.estado, this.fechaCreacion, this.version);
-    }
-    
-    /**
-     * Cambia el estado del usuario.
-     * 
-     * @param nuevoEstado Nuevo estado del usuario
-     * @return Nueva instancia de Usuario con el estado actualizado
-     */
-    public Usuario cambiarEstado(EstadoUsuario nuevoEstado) {
-        return new Usuario(this.id, this.nombre, this.apellido, this.email,
-                          this.documentoIdentidad, this.telefono, this.rolId,
-                          this.salarioBase, nuevoEstado, this.fechaCreacion, this.version);
-    }
-    
-    /**
-     * Marca el usuario como persistido con una nueva versión.
-     * 
-     * @param newVersion Nueva versión
-     * @return Nueva instancia de Usuario con la versión actualizada
-     */
-    public Usuario markPersisted(long newVersion) {
-        if (newVersion <= version) {
-            throw new IllegalArgumentException("La nueva versión debe ser mayor que la actual");
-        }
-        return new Usuario(this.id, this.nombre, this.apellido, this.email,
-                          this.documentoIdentidad, this.telefono, this.rolId,
-                          this.salarioBase, this.estado, this.fechaCreacion, newVersion);
-    }
-    
-    /**
-     * Verifica si el usuario está activo.
-     * 
-     * @return true si el usuario está activo
-     */
-    public boolean isActivo() {
-        return estado == EstadoUsuario.ACTIVO;
-    }
-    
-    /**
-     * Verifica si el usuario puede autenticarse.
-     * 
-     * @return true si el usuario puede autenticarse
-     */
-    public boolean puedeAutenticarse() {
-        return isActivo();
+                          nuevoSalario);
     }
     
     /**
@@ -228,15 +166,6 @@ public final class Usuario {
         }
         if (salarioBase == null) {
             throw new IllegalStateException("El salario base del usuario no puede ser nulo");
-        }
-        if (estado == null) {
-            throw new IllegalStateException("El estado del usuario no puede ser nulo");
-        }
-        if (fechaCreacion == null) {
-            throw new IllegalStateException("La fecha de creación del usuario no puede ser nula");
-        }
-        if (version < 0) {
-            throw new IllegalStateException("La versión del usuario no puede ser negativa");
         }
     }
     
@@ -313,33 +242,7 @@ public final class Usuario {
     public SalarioBase salarioBase() {
         return salarioBase;
     }
-    
-    /**
-     * Obtiene el estado del usuario.
-     * 
-     * @return Estado del usuario
-     */
-    public EstadoUsuario estado() {
-        return estado;
-    }
-    
-    /**
-     * Obtiene la fecha de creación del usuario.
-     * 
-     * @return Fecha de creación del usuario
-     */
-    public LocalDateTime fechaCreacion() {
-        return fechaCreacion;
-    }
-    
-    /**
-     * Obtiene la versión del usuario para control de concurrencia.
-     * 
-     * @return Versión del usuario
-     */
-    public long version() {
-        return version;
-    }
+
     
     @Override
     public boolean equals(Object obj) {
@@ -365,9 +268,6 @@ public final class Usuario {
                 ", telefono=" + telefono.value() +
                 ", rolId=" + rolId.value() +
                 ", salarioBase=" + salarioBase.value() +
-                ", estado=" + estado +
-                ", fechaCreacion=" + fechaCreacion +
-                ", version=" + version +
                 '}';
     }
 }

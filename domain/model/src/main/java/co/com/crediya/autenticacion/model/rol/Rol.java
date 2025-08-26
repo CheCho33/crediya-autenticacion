@@ -18,7 +18,6 @@ public final class Rol {
     private final RolId id;
     private final NombreRol nombre;
     private final DescripcionRol descripcion;
-    private final long version;
     
     /**
      * Constructor privado para crear una instancia de Rol.
@@ -26,13 +25,11 @@ public final class Rol {
      * @param id Identificador único del rol
      * @param nombre Nombre del rol
      * @param descripcion Descripción del rol
-     * @param version Versión para control de concurrencia optimista
      */
-    private Rol(RolId id, NombreRol nombre, DescripcionRol descripcion, long version) {
+    private Rol(RolId id, NombreRol nombre, DescripcionRol descripcion) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.version = version;
         validateInvariants();
     }
     
@@ -45,7 +42,7 @@ public final class Rol {
      * @return Nueva instancia de Rol
      */
     public static Rol create(RolId id, NombreRol nombre, DescripcionRol descripcion) {
-        return new Rol(id, nombre, descripcion, 0L);
+        return new Rol(id, nombre, descripcion);
     }
     
     /**
@@ -54,11 +51,10 @@ public final class Rol {
      * @param id Identificador único del rol
      * @param nombre Nombre del rol
      * @param descripcion Descripción del rol
-     * @param version Versión actual
      * @return Nueva instancia de Rol
      */
-    public static Rol from(RolId id, NombreRol nombre, DescripcionRol descripcion, long version) {
-        return new Rol(id, nombre, descripcion, version);
+    public static Rol from(RolId id, NombreRol nombre, DescripcionRol descripcion) {
+        return new Rol(id, nombre, descripcion);
     }
     
     /**
@@ -68,7 +64,7 @@ public final class Rol {
      * @return Nueva instancia de Rol con la descripción actualizada
      */
     public Rol updateDescripcion(DescripcionRol nuevaDescripcion) {
-        return new Rol(this.id, this.nombre, nuevaDescripcion, this.version);
+        return new Rol(this.id, this.nombre, nuevaDescripcion);
     }
     
     /**
@@ -78,20 +74,7 @@ public final class Rol {
      * @return Nueva instancia de Rol con el nombre actualizado
      */
     public Rol updateNombre(NombreRol nuevoNombre) {
-        return new Rol(this.id, nuevoNombre, this.descripcion, this.version);
-    }
-    
-    /**
-     * Marca el rol como persistido con una nueva versión.
-     * 
-     * @param newVersion Nueva versión
-     * @return Nueva instancia de Rol con la versión actualizada
-     */
-    public Rol markPersisted(long newVersion) {
-        if (newVersion <= version) {
-            throw new IllegalArgumentException("La nueva versión debe ser mayor que la actual");
-        }
-        return new Rol(this.id, this.nombre, this.descripcion, newVersion);
+        return new Rol(this.id, nuevoNombre, this.descripcion);
     }
     
     /**
@@ -165,9 +148,6 @@ public final class Rol {
         if (descripcion == null) {
             throw new IllegalStateException("La descripción del rol no puede ser nula");
         }
-        if (version < 0) {
-            throw new IllegalStateException("La versión del rol no puede ser negativa");
-        }
     }
     
     // Getters intencionales (no exponer estado mutable)
@@ -199,15 +179,6 @@ public final class Rol {
         return descripcion;
     }
     
-    /**
-     * Obtiene la versión del rol para control de concurrencia.
-     * 
-     * @return Versión del rol
-     */
-    public long version() {
-        return version;
-    }
-    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -227,7 +198,6 @@ public final class Rol {
                 "id=" + id.value() +
                 ", nombre=" + nombre.value() +
                 ", descripcion=" + descripcion.value() +
-                ", version=" + version +
                 '}';
     }
 }

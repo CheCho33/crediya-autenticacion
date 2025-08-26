@@ -1,5 +1,8 @@
 package co.com.crediya.autenticacion.config;
 
+import co.com.crediya.autenticacion.model.usuario.gateways.UsuarioRepository;
+import co.com.crediya.autenticacion.usecase.usuario.RegistrarUsuarioUseCase;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
@@ -11,4 +14,11 @@ import org.springframework.context.annotation.FilterType;
         },
         useDefaultFilters = false)
 public class UseCasesConfig {
+
+    @Bean
+    public RegistrarUsuarioUseCase registrarUsuarioUseCase(UsuarioRepository usuarioRepository
+                                                           ) {
+        return new RegistrarUsuarioUseCase(usuarioRepository);
+    }
+
 }
