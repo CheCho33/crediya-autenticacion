@@ -15,13 +15,13 @@ public class PostgreSQLConnectionPool {
     public static final int INITIAL_SIZE = 12;
     public static final int MAX_SIZE = 15;
     public static final int MAX_IDLE_TIME = 30;
-    public static final int DEFAULT_PORT = 5432;
+    public static final int DEFAULT_PORT = 5438;
 
 	@Bean
 	public ConnectionPool getConnectionConfig(PostgresqlConnectionProperties properties) {
 		PostgresqlConnectionConfiguration dbConfiguration = PostgresqlConnectionConfiguration.builder()
                 .host(properties.host())
-                .port(properties.port())
+                .port(properties.port() != null ? properties.port() : DEFAULT_PORT)
                 .database(properties.database())
                 .schema(properties.schema())
                 .username(properties.username())

@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 public class UsuarioUseCase {
     
     private final RegistrarUsuarioUseCase registrarUsuarioUseCase;
-    
+
     public UsuarioUseCase(RegistrarUsuarioUseCase registrarUsuarioUseCase) {
         this.registrarUsuarioUseCase = registrarUsuarioUseCase;
     }
@@ -20,10 +20,10 @@ public class UsuarioUseCase {
     /**
      * Registra un nuevo usuario en el sistema.
      * 
-     * @param datos Datos del usuario a registrar
+     * @param usuario Datos del usuario a registrar
      * @return Mono con el usuario registrado exitosamente
      */
-    public Mono<Usuario> registrarUsuario(DatosRegistroUsuario datos) {
-        return registrarUsuarioUseCase.registrar(datos);
+    public Mono<Usuario> registrarUsuario(Usuario usuario) {
+        return registrarUsuarioUseCase.registrar(usuario);
     }
 }

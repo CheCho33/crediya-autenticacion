@@ -1,4 +1,4 @@
-package co.com.crediya.autenticacion.model.usuario;
+package co.com.crediya.autenticacion.model.valueobjects;
 
 /**
  * Enum que representa los posibles estados de un Usuario en el sistema.

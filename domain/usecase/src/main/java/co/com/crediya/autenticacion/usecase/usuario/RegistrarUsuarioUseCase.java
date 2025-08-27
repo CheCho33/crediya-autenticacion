@@ -1,20 +1,9 @@
 package co.com.crediya.autenticacion.usecase.usuario;
 
-import java.util.UUID;
 
-import co.com.crediya.autenticacion.model.exceptions.ConflictDomainException;
-import co.com.crediya.autenticacion.model.exceptions.DomainException;
-import co.com.crediya.autenticacion.model.exceptions.ValidationDomainException;
-import co.com.crediya.autenticacion.model.rol.RolId;
+import co.com.crediya.autenticacion.model.exceptions.CrediYautentiateException;
 import co.com.crediya.autenticacion.model.usuario.Usuario;
 import co.com.crediya.autenticacion.model.usuario.gateways.UsuarioRepository;
-import co.com.crediya.autenticacion.model.valueobjects.ApellidoUsuario;
-import co.com.crediya.autenticacion.model.valueobjects.DocumentoIdentidad;
-import co.com.crediya.autenticacion.model.valueobjects.Email;
-import co.com.crediya.autenticacion.model.valueobjects.NombreUsuario;
-import co.com.crediya.autenticacion.model.valueobjects.SalarioBase;
-import co.com.crediya.autenticacion.model.valueobjects.Telefono;
-import co.com.crediya.autenticacion.model.valueobjects.UsuarioId;
 import reactor.core.publisher.Mono;
 
 /**
@@ -31,11 +20,9 @@ public class RegistrarUsuarioUseCase {
         this.usuarioRepository = usuarioRepository;
     }
     
-    public Mono<Usuario> registrar(DatosRegistroUsuario datos) {
-        return Mono.just(datos)
+    public Mono<Usuario> registrar(Usuario usuario) {
+        return Mono.just(usuario)
             .flatMap(this::validarDatos)
-            .flatMap(this::validarUnicidadEmail)
-            .flatMap(this::crearUsuario)
             .flatMap(usuarioRepository::guardar)
             .onErrorMap(this::mapearExcepciones);
     }
@@ -43,68 +30,33 @@ public class RegistrarUsuarioUseCase {
     /**
      * Valida los datos de entrada del usuario.
      * 
-     * @param datos Datos a validar
+     * @param usuario Datos a validar
      * @return Mono con los datos validados
      */
-    private Mono<DatosRegistroUsuario> validarDatos(DatosRegistroUsuario datos) {
-        return Mono.fromCallable(() -> {
-            try {
-                // Las validaciones básicas ya están en el constructor del record
-                // Aquí se pueden agregar validaciones adicionales si es necesario
-                return datos;
-            } catch (IllegalArgumentException e) {
-                throw new ValidationDomainException(e.getMessage(), "usuario.datos.invalidos");
-            }
-        });
+    private Mono<Usuario> validarDatos(Usuario usuario) {
+
+        return UsuarioValidator.validarUsuario(usuario)
+                .flatMap(this::validarUnicidadEmail);
     }
     
     /**
      * Valida que el email no esté previamente registrado.
      * 
-     * @param datos Datos del usuario
+     * @param usuario email del usuario a validar
      * @return Mono con los datos si el email es único
      */
-    private Mono<DatosRegistroUsuario> validarUnicidadEmail(DatosRegistroUsuario datos) {
-        return usuarioRepository.existePorEmail(Email.of(datos.email()))
+    private Mono<Usuario> validarUnicidadEmail(Usuario usuario) {
+        return usuarioRepository.existePorEmail(usuario.getEmail().toLowerCase())
             .flatMap(existe -> {
                 if (existe) {
-                    return Mono.error(new ConflictDomainException(
-                        "El correo electrónico ya está registrado en el sistema",
-                        "usuario.email.duplicado"
+                    return Mono.error(new CrediYautentiateException(
+                        "El email ya está registrado en el sistema"
                     ));
                 }
-                return Mono.just(datos);
+                return Mono.just(usuario);
             });
     }
-    
-    /**
-     * Crea la entidad Usuario a partir de los datos validados.
-     * 
-     * @param datos Datos validados del usuario
-     * @return Mono con el usuario creado
-     */
-    private Mono<Usuario> crearUsuario(DatosRegistroUsuario datos) {
-        return Mono.fromCallable(() -> {
-            try {
-                // Crear value objects
-                UsuarioId id = UsuarioId.of(UUID.randomUUID());
-                NombreUsuario nombre = NombreUsuario.of(datos.nombres());
-                ApellidoUsuario apellido = ApellidoUsuario.of(datos.apellidos());
-                Email email = Email.of(datos.email());
-                DocumentoIdentidad documento = DocumentoIdentidad.of(datos.documento_identidad());
-                Telefono telefono = Telefono.of(datos.telefono());
-                SalarioBase salario = SalarioBase.of(datos.salario_base());
-                RolId rolId = RolId.of(UUID.randomUUID()); // TODO: Mapear según rol
-                
 
-                // Crear usuario
-                return Usuario.create(id, nombre, apellido, email, documento, telefono, rolId, salario);
-                
-            } catch (IllegalArgumentException e) {
-                throw new ValidationDomainException(e.getMessage(), "usuario.creacion.invalida");
-            }
-        });
-    }
     
     /**
      * Mapea las excepciones del dominio a excepciones específicas.
@@ -113,16 +65,11 @@ public class RegistrarUsuarioUseCase {
      * @return Excepción mapeada
      */
     private Throwable mapearExcepciones(Throwable error) {
-        if (error instanceof DomainException) {
+        if (error instanceof CrediYautentiateException) {
             return error;
         }
-        
-        // Mapear excepciones técnicas a excepciones de dominio
-        if (error instanceof IllegalArgumentException) {
-            return new ValidationDomainException(error.getMessage(), "usuario.validacion.error");
+        else{
+            return new CrediYautentiateException("Ha ocurrido un error inesperado al registrar el usuario. Por favor, intente nuevamente.");
         }
-        
-        // Para otras excepciones, mantener el error original
-        return error;
     }
 }

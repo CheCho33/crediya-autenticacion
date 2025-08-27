@@ -1,7 +1,6 @@
 package co.com.crediya.autenticacion.model.rol;
 
-import co.com.crediya.autenticacion.model.valueobjects.DescripcionRol;
-import co.com.crediya.autenticacion.model.valueobjects.NombreRol;
+import lombok.*;
 
 /**
  * Entidad que representa un Rol en el sistema de autenticación CrediYa.
@@ -13,191 +12,15 @@ import co.com.crediya.autenticacion.model.valueobjects.NombreRol;
  * - ASESOR: Asesor financiero
  * - CLIENTE: Cliente del sistema
  */
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public final class Rol {
     
-    private final RolId id;
-    private final NombreRol nombre;
-    private final DescripcionRol descripcion;
-    
-    /**
-     * Constructor privado para crear una instancia de Rol.
-     * 
-     * @param id Identificador único del rol
-     * @param nombre Nombre del rol
-     * @param descripcion Descripción del rol
-     */
-    private Rol(RolId id, NombreRol nombre, DescripcionRol descripcion) {
-        this.id = id;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        validateInvariants();
-    }
-    
-    /**
-     * Crea un nuevo rol con los datos proporcionados.
-     * 
-     * @param id Identificador único del rol
-     * @param nombre Nombre del rol
-     * @param descripcion Descripción del rol
-     * @return Nueva instancia de Rol
-     */
-    public static Rol create(RolId id, NombreRol nombre, DescripcionRol descripcion) {
-        return new Rol(id, nombre, descripcion);
-    }
-    
-    /**
-     * Crea un rol a partir de datos existentes (para reconstrucción desde persistencia).
-     * 
-     * @param id Identificador único del rol
-     * @param nombre Nombre del rol
-     * @param descripcion Descripción del rol
-     * @return Nueva instancia de Rol
-     */
-    public static Rol from(RolId id, NombreRol nombre, DescripcionRol descripcion) {
-        return new Rol(id, nombre, descripcion);
-    }
-    
-    /**
-     * Actualiza la descripción del rol.
-     * 
-     * @param nuevaDescripcion Nueva descripción del rol
-     * @return Nueva instancia de Rol con la descripción actualizada
-     */
-    public Rol updateDescripcion(DescripcionRol nuevaDescripcion) {
-        return new Rol(this.id, this.nombre, nuevaDescripcion);
-    }
-    
-    /**
-     * Actualiza el nombre del rol.
-     * 
-     * @param nuevoNombre Nuevo nombre del rol
-     * @return Nueva instancia de Rol con el nombre actualizado
-     */
-    public Rol updateNombre(NombreRol nuevoNombre) {
-        return new Rol(this.id, nuevoNombre, this.descripcion);
-    }
-    
-    /**
-     * Verifica si el rol tiene un nombre específico (ignorando mayúsculas/minúsculas).
-     * 
-     * @param nombreRol Nombre a verificar
-     * @return true si el nombre coincide
-     */
-    public boolean hasNombre(NombreRol nombreRol) {
-        return this.nombre.equalsIgnoreCase(nombreRol);
-    }
-    
-    /**
-     * Verifica si el rol es administrador.
-     * 
-     * @return true si es rol de administrador
-     */
-    public boolean isAdmin() {
-        return this.nombre.equalsIgnoreCase(NombreRol.of("ADMIN"));
-    }
-    
-    /**
-     * Verifica si el rol es asesor.
-     * 
-     * @return true si es rol de asesor
-     */
-    public boolean isAsesor() {
-        return this.nombre.equalsIgnoreCase(NombreRol.of("ASESOR"));
-    }
-    
-    /**
-     * Verifica si el rol es cliente.
-     * 
-     * @return true si es rol de cliente
-     */
-    public boolean isCliente() {
-        return this.nombre.equalsIgnoreCase(NombreRol.of("CLIENTE"));
-    }
-    
-    /**
-     * Verifica si el rol tiene permisos administrativos.
-     * 
-     * @return true si el rol tiene permisos de administrador o asesor
-     */
-    public boolean tienePermisosAdministrativos() {
-        return isAdmin() || isAsesor();
-    }
-    
-    /**
-     * Verifica si el rol puede registrar usuarios.
-     * Según las especificaciones, solo ADMIN y ASESOR pueden registrar usuarios.
-     * 
-     * @return true si el rol puede registrar usuarios
-     */
-    public boolean puedeRegistrarUsuarios() {
-        return tienePermisosAdministrativos();
-    }
-    
-    /**
-     * Valida los invariantes de la entidad.
-     * 
-     * @throws IllegalStateException si los invariantes no se cumplen
-     */
-    private void validateInvariants() {
-        if (id == null) {
-            throw new IllegalStateException("El identificador del rol no puede ser nulo");
-        }
-        if (nombre == null) {
-            throw new IllegalStateException("El nombre del rol no puede ser nulo");
-        }
-        if (descripcion == null) {
-            throw new IllegalStateException("La descripción del rol no puede ser nula");
-        }
-    }
-    
-    // Getters intencionales (no exponer estado mutable)
-    
-    /**
-     * Obtiene el identificador del rol.
-     * 
-     * @return Identificador del rol
-     */
-    public RolId id() {
-        return id;
-    }
-    
-    /**
-     * Obtiene el nombre del rol.
-     * 
-     * @return Nombre del rol
-     */
-    public NombreRol nombre() {
-        return nombre;
-    }
-    
-    /**
-     * Obtiene la descripción del rol.
-     * 
-     * @return Descripción del rol
-     */
-    public DescripcionRol descripcion() {
-        return descripcion;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Rol rol = (Rol) obj;
-        return id.equals(rol.id);
-    }
-    
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-    
-    @Override
-    public String toString() {
-        return "Rol{" +
-                "id=" + id.value() +
-                ", nombre=" + nombre.value() +
-                ", descripcion=" + descripcion.value() +
-                '}';
-    }
+    private Long rolId;
+    private String nombreRol;
+    private String descripcionRol;
 }
