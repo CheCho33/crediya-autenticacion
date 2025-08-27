@@ -1,5 +1,6 @@
 package co.com.crediya.autenticacion.api;
 
+import co.com.crediya.autenticacion.api.dto.ErrorResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,25 +34,19 @@ public class RouterRest {
                     operation = @Operation(
                             operationId = "guardarUsuario",
                             summary = "Crea un nuevo usuario",
-                            description = "Registra un usuario y retorna una respuesta genérica con el resultado",
+                            description = "Registra un usuario y retorna mensaje de exito y datos almacenados",
                             tags = {"Usuarios"},
                             requestBody = @RequestBody(
-                                    required = true,
-                                    description = "Payload para crear usuario",
-                                    content = @Content(
-                                            schema = @Schema(implementation = CrearUsuarioDto.class)
-                                    )
+                                    required = true, description = "Payload para crear usuario",
+                                    content = @Content(schema = @Schema(implementation = CrearUsuarioDto.class))
                             ),
                             responses = {
-                                    @ApiResponse(
-                                            responseCode = "200",
-                                            description = "Usuario creado",
-                                            content = @Content(
-                                                    schema = @Schema(implementation = RespuestaGenericaDto.class)
-                                            )
-                                    ),
-                                    @ApiResponse(responseCode = "400", description = "Solicitud inválida"),
-                                    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+                                    @ApiResponse(responseCode = "200", description = "Usuario creado",
+                                            content = @Content( schema = @Schema(implementation = RespuestaGenericaDto.class))),
+                                    @ApiResponse(responseCode = "400", description = "Solicitud inválida",
+                                            content = @Content( schema = @Schema(implementation = ErrorResponseDto.class))),
+                                    @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                                            content = @Content( schema = @Schema(implementation = ErrorResponseDto.class))),
                             }
                     )
             )

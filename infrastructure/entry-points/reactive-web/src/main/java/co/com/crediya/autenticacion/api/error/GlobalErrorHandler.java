@@ -1,6 +1,7 @@
 package co.com.crediya.autenticacion.api.error;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -14,7 +15,8 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 
 @Component
-@Order(-2) // Prioridad alta para capturar errores antes que otros handlers
+@Order(-2)
+@Slf4j// Prioridad alta para capturar errores antes que otros handlers
 public class GlobalErrorHandler implements ErrorWebExceptionHandler {
 
     @Override
@@ -32,9 +34,8 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
         response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         // Log del error (simplificado)
-        System.err.println("Error no manejado en endpoint: " +
-                exchange.getRequest().getPath() + " - Status: " + status + " - Error: " + ex.getMessage());
-
+        log.error("Error no manejado en endpoint: {} - Status: {} - Error: {}",
+                exchange.getRequest().getPath(), status, ex.getMessage());
         // Escribir respuesta de error
         DataBuffer buffer = response.bufferFactory()
                 .wrap(errorMessage.getBytes(StandardCharsets.UTF_8));
@@ -64,10 +65,8 @@ public class GlobalErrorHandler implements ErrorWebExceptionHandler {
         return String.format("""
                 {
                     "timestamp": "%s",
-                    "status": %d,
                     "error": "%s",
                     "message": "%s",
-                    "path": "N/A"
                 }
                 """,
                 java.time.Instant.now(),
