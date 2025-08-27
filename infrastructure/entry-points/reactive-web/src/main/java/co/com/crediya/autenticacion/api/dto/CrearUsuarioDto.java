@@ -1,9 +1,7 @@
 package co.com.crediya.autenticacion.api.dto;
 
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
 
 public record CrearUsuarioDto(
@@ -26,6 +24,8 @@ public record CrearUsuarioDto(
         @NotNull
         Long rolId,
 
+        @DecimalMin(value = "1.0", inclusive = true, message = "el salario base debe ser mayor 0")
+        @DecimalMax(value = "15000000.0", inclusive = true, message = "el salario base debe ser menor a 15.000.000")
         @NotNull
         Double salarioBase
 ) {

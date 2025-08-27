@@ -29,11 +29,17 @@ public class Handler {
         log.info("Inicio Creacion de Usuario");
         return serverRequest
                 .bodyToMono(CrearUsuarioDto.class)
-                .map( usuarioRequest::toUsuario)
+                .doOnNext(dto -> log.info("DTO recibido: {}", dto))
+                .map(usuarioRequest::toUsuario)
                 .flatMap(usuarioUseCase::registrarUsuario)
                 .map(usuario -> new RespuestaGenericaDto("Usuario Creado", usuario))
                 .flatMap(respuesta -> ServerResponse.ok().bodyValue(respuesta))
-                .doOnSuccess(resp -> log.info("Usuario creado"))
-                .doOnError(resp -> log.info("Error al crear el usuario"));
+                .doOnSuccess(resp -> log.info("Usuario creado exitosamente"))
+                .doOnError(error -> {
+                    log.error("Error al crear usuario: {}", error.getMessage());
+                    if (error instanceof org.springframework.web.bind.support.WebExchangeBindException) {
+                        log.error("Error de validación detectado");
+                    }
+                });
     }
 }
