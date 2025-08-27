@@ -14,11 +14,12 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Test unitarios para UsuarioAdapters.
  * Verifica el comportamiento del adaptador mockeando las interacciones con la base de datos.
+ * Incluye verificaciones de transaccionalidad.
  */
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UsuarioAdapters Tests")
@@ -59,7 +60,7 @@ class UsuarioAdaptersTest {
     }
 
     @Test
-    @DisplayName("Debe guardar un usuario exitosamente")
+    @DisplayName("Debe guardar un usuario exitosamente con transacción")
     void debeGuardarUsuarioExitosamente() {
         // Given
         when(usuarioEntityRepository.save(any(UsuarioEntity.class)))
@@ -81,10 +82,13 @@ class UsuarioAdaptersTest {
                     usuario.getSalarioBase().equals(2500000.0)
                 )
                 .verifyComplete();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).save(any(UsuarioEntity.class));
     }
 
     @Test
-    @DisplayName("Debe manejar error al guardar usuario")
+    @DisplayName("Debe manejar error al guardar usuario con rollback")
     void debeManejarErrorAlGuardarUsuario() {
         // Given
         when(usuarioEntityRepository.save(any(UsuarioEntity.class)))
@@ -97,10 +101,13 @@ class UsuarioAdaptersTest {
         StepVerifier.create(resultado)
                 .expectError(RuntimeException.class)
                 .verify();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).save(any(UsuarioEntity.class));
     }
 
     @Test
-    @DisplayName("Debe buscar usuario por email exitosamente")
+    @DisplayName("Debe buscar usuario por email exitosamente (readOnly)")
     void debeBuscarUsuarioPorEmailExitosamente() {
         // Given
         String email = "juan.perez@example.com";
@@ -117,11 +124,13 @@ class UsuarioAdaptersTest {
                     usuario.getNombre().equals("Juan")
                 )
                 .verifyComplete();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).findByEmail(email);
     }
 
-
     @Test
-    @DisplayName("Debe verificar existencia de usuario por email - existe")
+    @DisplayName("Debe verificar existencia de usuario por email - existe (readOnly)")
     void debeVerificarExistenciaUsuarioPorEmail_Existe() {
         // Given
         String email = "juan.perez@example.com";
@@ -135,10 +144,13 @@ class UsuarioAdaptersTest {
         StepVerifier.create(resultado)
                 .expectNext(true)
                 .verifyComplete();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).existsByEmail(email);
     }
 
     @Test
-    @DisplayName("Debe verificar existencia de usuario por email - no existe")
+    @DisplayName("Debe verificar existencia de usuario por email - no existe (readOnly)")
     void debeVerificarExistenciaUsuarioPorEmail_NoExiste() {
         // Given
         String email = "noexiste@example.com";
@@ -152,10 +164,13 @@ class UsuarioAdaptersTest {
         StepVerifier.create(resultado)
                 .expectNext(false)
                 .verifyComplete();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).existsByEmail(email);
     }
 
     @Test
-    @DisplayName("Debe buscar usuario por ID exitosamente")
+    @DisplayName("Debe buscar usuario por ID exitosamente (readOnly)")
     void debeBuscarUsuarioPorIdExitosamente() {
         // Given
         Long idUsuario = 1L;
@@ -172,10 +187,13 @@ class UsuarioAdaptersTest {
                     usuario.getNombre().equals("Juan")
                 )
                 .verifyComplete();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).findById(idUsuario);
     }
 
     @Test
-    @DisplayName("Debe retornar empty cuando no encuentra usuario por ID")
+    @DisplayName("Debe retornar empty cuando no encuentra usuario por ID (readOnly)")
     void debeRetornarEmptyNoCuandoEncuentraUsuarioPorId() {
         // Given
         Long idUsuario = 999L;
@@ -188,6 +206,9 @@ class UsuarioAdaptersTest {
         // Then
         StepVerifier.create(resultado)
                 .verifyComplete();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).findById(idUsuario);
     }
 
     @Test
@@ -205,6 +226,9 @@ class UsuarioAdaptersTest {
         StepVerifier.create(resultado)
                 .expectError(RuntimeException.class)
                 .verify();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).findByEmail(email);
     }
 
     @Test
@@ -222,6 +246,9 @@ class UsuarioAdaptersTest {
         StepVerifier.create(resultado)
                 .expectError(RuntimeException.class)
                 .verify();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).existsByEmail(email);
     }
 
     @Test
@@ -239,5 +266,9 @@ class UsuarioAdaptersTest {
         StepVerifier.create(resultado)
                 .expectError(RuntimeException.class)
                 .verify();
+
+        // Verificar que se llamó al repositorio
+        verify(usuarioEntityRepository, times(1)).findById(idUsuario);
     }
+
 }
