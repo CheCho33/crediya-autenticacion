@@ -3,7 +3,7 @@ package co.com.crediya.autenticacion.api;
 import co.com.crediya.autenticacion.api.dto.CrearUsuarioDto;
 import co.com.crediya.autenticacion.api.dto.RespuestaGenericaDto;
 import co.com.crediya.autenticacion.api.mapper.UsuarioRequest;
-import co.com.crediya.autenticacion.usecase.usuario.UsuarioUseCase;
+import co.com.crediya.autenticacion.usecase.usuario.RegistrarUsuarioUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -18,10 +18,9 @@ public class Handler {
 
     private final UsuarioRequest usuarioRequest;
 
-    private final UsuarioUseCase usuarioUseCase;
+    private final RegistrarUsuarioUseCase registrarUsuarioUseCase;
 
     public Mono<ServerResponse> listenGETUseCase(ServerRequest serverRequest) {
-        // useCase.logic();
         return ServerResponse.ok().bodyValue("");
     }
 
@@ -31,7 +30,7 @@ public class Handler {
                 .bodyToMono(CrearUsuarioDto.class)
                 .doOnNext(dto -> log.info("DTO recibido: {}", dto))
                 .map(usuarioRequest::toUsuario)
-                .flatMap(usuarioUseCase::registrarUsuario)
+                .flatMap(registrarUsuarioUseCase::registrar)
                 .map(usuario -> new RespuestaGenericaDto("Usuario Creado", usuario))
                 .flatMap(respuesta -> ServerResponse.ok().bodyValue(respuesta))
                 .doOnSuccess(resp -> log.info("Usuario creado exitosamente"))

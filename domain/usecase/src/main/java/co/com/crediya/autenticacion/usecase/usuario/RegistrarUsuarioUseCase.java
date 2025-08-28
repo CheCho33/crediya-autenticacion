@@ -22,9 +22,9 @@ public class RegistrarUsuarioUseCase {
     
     public Mono<Usuario> registrar(Usuario usuario) {
         return Mono.just(usuario)
-            .flatMap(this::validarDatos)
-            .flatMap(usuarioRepository::guardar)
-            .onErrorMap(this::mapearExcepciones);
+                .flatMap(this::validarDatos)
+                .flatMap(usuarioRepository::guardar)
+                .onErrorMap(this::mapearExcepciones);
     }
     
     /**
@@ -36,7 +36,19 @@ public class RegistrarUsuarioUseCase {
     private Mono<Usuario> validarDatos(Usuario usuario) {
 
         return UsuarioValidator.validarUsuario(usuario)
+                .flatMap(this::sanitizarDatos)
                 .flatMap(this::validarUnicidadEmail);
+    }
+
+    /**
+     * Sanitiza los datos del usuario (e.g., normalización de email).
+     */
+    private Mono<Usuario> sanitizarDatos(Usuario usuario) {
+        return Mono.just(usuario)
+            .map(user -> {
+                user.setEmail(user.getEmail().toLowerCase().trim());
+                return user;
+            });
     }
     
     /**
@@ -56,7 +68,6 @@ public class RegistrarUsuarioUseCase {
                 return Mono.just(usuario);
             });
     }
-
     
     /**
      * Mapea las excepciones del dominio a excepciones específicas.

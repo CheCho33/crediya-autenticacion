@@ -38,7 +38,7 @@ public class UsuarioValidator {
             String msg = "El salario base no puede ser negativo";
             return Mono.error(new CrediYautentiateException(msg));
         }
-        if (usuario.getSalarioBase() > 150000.00) {
+        if (usuario.getSalarioBase() > 15000000.00) {
             String msg = "El salario base no puede exceder 15,000,000";
             return Mono.error(new CrediYautentiateException(msg));
         }
