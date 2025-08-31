@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono;
 
 /**
  * Implementación del caso de uso para registrar un nuevo usuario.
- * 
  * Este servicio implementa las reglas de negocio para el registro de usuarios
  * siguiendo los principios de arquitectura hexagonal y programación reactiva.
  */
@@ -29,9 +28,6 @@ public class RegistrarUsuarioUseCase {
     
     /**
      * Valida los datos de entrada del usuario.
-     * 
-     * @param usuario Datos a validar
-     * @return Mono con los datos validados
      */
     private Mono<Usuario> validarDatos(Usuario usuario) {
 
@@ -53,9 +49,6 @@ public class RegistrarUsuarioUseCase {
     
     /**
      * Valida que el email no esté previamente registrado.
-     * 
-     * @param usuario email del usuario a validar
-     * @return Mono con los datos si el email es único
      */
     private Mono<Usuario> validarUnicidadEmail(Usuario usuario) {
         return usuarioRepository.existePorEmail(usuario.getEmail().toLowerCase())
@@ -71,9 +64,6 @@ public class RegistrarUsuarioUseCase {
     
     /**
      * Mapea las excepciones del dominio a excepciones específicas.
-     * 
-     * @param error Error original
-     * @return Excepción mapeada
      */
     private Throwable mapearExcepciones(Throwable error) {
         if (error instanceof CrediYautentiateException) {

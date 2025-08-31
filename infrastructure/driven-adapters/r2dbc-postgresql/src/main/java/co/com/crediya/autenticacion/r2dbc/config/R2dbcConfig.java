@@ -1,6 +1,5 @@
 package co.com.crediya.autenticacion.r2dbc.config;
 
-import io.r2dbc.spi.ConnectionFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +7,8 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
+
+import io.r2dbc.spi.ConnectionFactory;
 
 /**
  * Configuración para habilitar las propiedades de R2DBC PostgreSQL.

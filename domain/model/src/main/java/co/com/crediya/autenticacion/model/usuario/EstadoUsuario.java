@@ -1,4 +1,4 @@
-package co.com.crediya.autenticacion.model.valueobjects;
+package co.com.crediya.autenticacion.model.usuario;
 
 /**
  * Enum que representa los posibles estados de un Usuario en el sistema.
@@ -8,24 +8,9 @@ package co.com.crediya.autenticacion.model.valueobjects;
  */
 public enum EstadoUsuario {
     
-    /**
-     * Usuario activo que puede autenticarse y acceder al sistema.
-     */
     ACTIVO("ACTIVO"),
-    
-    /**
-     * Usuario inactivo que no puede autenticarse.
-     */
     INACTIVO("INACTIVO"),
-    
-    /**
-     * Usuario suspendido temporalmente.
-     */
     SUSPENDIDO("SUSPENDIDO"),
-    
-    /**
-     * Usuario eliminado del sistema.
-     */
     ELIMINADO("ELIMINADO");
     
     private final String valor;
@@ -33,12 +18,7 @@ public enum EstadoUsuario {
     EstadoUsuario(String valor) {
         this.valor = valor;
     }
-    
-    /**
-     * Obtiene el valor del estado como String.
-     * 
-     * @return Valor del estado
-     */
+
     public String getValor() {
         return valor;
     }

@@ -3,6 +3,8 @@ package co.com.crediya.autenticacion.api;
 import co.com.crediya.autenticacion.api.dto.CrearUsuarioDto;
 import co.com.crediya.autenticacion.api.dto.RespuestaGenericaDto;
 import co.com.crediya.autenticacion.api.mapper.UsuarioRequest;
+import co.com.crediya.autenticacion.model.usuario.dto.UsuarioLoginDto;
+import co.com.crediya.autenticacion.usecase.sesion.LoginSesionUseCase;
 import co.com.crediya.autenticacion.usecase.usuario.RegistrarUsuarioUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,7 @@ public class Handler {
     private final UsuarioRequest usuarioRequest;
 
     private final RegistrarUsuarioUseCase registrarUsuarioUseCase;
+    private final LoginSesionUseCase loginSesionUseCase;
 
     public Mono<ServerResponse> listenGETUseCase(ServerRequest serverRequest) {
         return ServerResponse.ok().bodyValue("");
@@ -36,9 +39,16 @@ public class Handler {
                 .doOnSuccess(resp -> log.info("Usuario creado exitosamente"))
                 .doOnError(error -> {
                     log.error("Error al crear usuario: {}", error.getMessage());
-                    if (error instanceof org.springframework.web.bind.support.WebExchangeBindException) {
-                        log.error("Error de validación detectado");
-                    }
                 });
+    }
+
+    public Mono<ServerResponse> loginUsuario(ServerRequest serverRequest) {
+        log.info("Autenticacion de usuario");
+        return serverRequest
+                .bodyToMono(UsuarioLoginDto.class)
+                .doOnNext(dto -> log.info("Login de usuario {}", dto.getEmail()))
+                .flatMap(loginSesionUseCase::loginUsuairo)
+                .flatMap(respuesta -> ServerResponse.ok().bodyValue(respuesta))
+                .doOnError(error -> log.error("Error al crear usuario: {}", error.getMessage()));
     }
 }

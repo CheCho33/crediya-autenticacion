@@ -26,5 +26,6 @@ public final class Usuario {
     private String telefono;
     private Long  rolId;
     private Double salarioBase;
+    private String contrasena;
 
 }

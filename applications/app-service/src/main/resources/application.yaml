@@ -31,3 +31,7 @@ adapters:
     schema: "public"
     username: "postgres"
     password: "root"
+
+jwt:
+  secret: "CrediYaSecretKey2024ForJWTTokenGenerationAndValidation"
+  expiration: 86400000

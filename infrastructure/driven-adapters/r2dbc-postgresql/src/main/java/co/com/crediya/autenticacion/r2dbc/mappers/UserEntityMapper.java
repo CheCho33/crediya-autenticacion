@@ -29,6 +29,7 @@ public class UserEntityMapper {
         usuario.setTelefono(usuarioEntity.getTelefono());
         usuario.setRolId(usuarioEntity.getRolId());
         usuario.setSalarioBase(usuarioEntity.getSalarioBase());
+        usuario.setContrasena(usuarioEntity.getContrasena());
 
         return usuario;
     }
@@ -53,6 +54,7 @@ public class UserEntityMapper {
                 .telefono(usuario.getTelefono())
                 .rolId(usuario.getRolId())
                 .salarioBase(usuario.getSalarioBase())
+                .contrasena(usuario.getContrasena())
                 .build();
     }
 }

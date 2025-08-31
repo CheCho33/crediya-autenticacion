@@ -41,4 +41,7 @@ public class UsuarioEntity {
 
     @Column("salario_base")
     private Double salarioBase;
+
+    @Column("contrasena")
+    private String contrasena;
 }

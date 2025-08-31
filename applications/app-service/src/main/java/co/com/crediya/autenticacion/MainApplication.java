@@ -7,7 +7,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @SpringBootApplication(scanBasePackages = {
         "co.com.crediya.autenticacion.config",
         "co.com.crediya.autenticacion.r2dbc",
-        "co.com.crediya.autenticacion.api"
+        "co.com.crediya.autenticacion.api",
+        "co.com.crediya.autenticacion.jwtservice"
 })
 @ConfigurationPropertiesScan
 public class MainApplication {
