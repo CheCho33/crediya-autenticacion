@@ -21,6 +21,7 @@ public class SecurityConfig {
                     // Endpoints públicos - login debe estar primero
                     .pathMatchers("/api/v1/login").permitAll()
                     .pathMatchers("/api/api/v1/usuarios").permitAll()
+                    .pathMatchers("/api/v1/usuarios").permitAll()
                     .pathMatchers("/api/usecase/**").permitAll()
                     .pathMatchers("/h2/**").permitAll()
                     .pathMatchers("/actuator/**").permitAll()

@@ -8,8 +8,10 @@ public enum UrlsAsesor {
     
     // Gestión de usuarios
     USUARIO_TEST("/api/usecase/path"),
-    USUARIOS_USUARIOS("/api/api/v1/usuarios"),
+    USUARIOS1_USUARIOS("/api/api/v1/usuarios"),
+    USUARIOS_USUARIOS("/api/v1/usuarios"),
     USUARIOS_LOGIN("/api/v1/login"),
+    USUARIOS_AUTORIZACION("/api/v1/autorizacion"),
 
     SOLICITUDES_SOLICITUD("/api/v1/solicitud");
 

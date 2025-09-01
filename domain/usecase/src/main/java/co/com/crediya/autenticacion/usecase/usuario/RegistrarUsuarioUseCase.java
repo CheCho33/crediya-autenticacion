@@ -4,20 +4,13 @@ package co.com.crediya.autenticacion.usecase.usuario;
 import co.com.crediya.autenticacion.model.exceptions.CrediYautentiateException;
 import co.com.crediya.autenticacion.model.usuario.Usuario;
 import co.com.crediya.autenticacion.model.usuario.gateways.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-/**
- * Implementación del caso de uso para registrar un nuevo usuario.
- * Este servicio implementa las reglas de negocio para el registro de usuarios
- * siguiendo los principios de arquitectura hexagonal y programación reactiva.
- */
+@RequiredArgsConstructor
 public class RegistrarUsuarioUseCase {
     
     private final UsuarioRepository usuarioRepository;
-    
-    public RegistrarUsuarioUseCase(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
-    }
     
     public Mono<Usuario> registrar(Usuario usuario) {
         return Mono.just(usuario)
@@ -25,7 +18,7 @@ public class RegistrarUsuarioUseCase {
                 .flatMap(usuarioRepository::guardar)
                 .onErrorMap(this::mapearExcepciones);
     }
-    
+
     /**
      * Valida los datos de entrada del usuario.
      */

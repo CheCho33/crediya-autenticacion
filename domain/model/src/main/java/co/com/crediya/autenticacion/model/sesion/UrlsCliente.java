@@ -9,10 +9,11 @@ public enum UrlsCliente {
     // Gestión de usuarios
     USUARIO_TEST("/api/usecase/path"),
     USUARIOS_LOGIN("/api/v1/login"),
+    USUARIOS_AUTORIZACION("/api/v1/autorizacion"),
+    USUARIOS_USUARIOS("/api/v1/usuarios"),
 
     SOLICITUDES_SOLICITUD("/api/v1/solicitud");
 
-    
     private final String url;
     
     UrlsCliente(String url) {
