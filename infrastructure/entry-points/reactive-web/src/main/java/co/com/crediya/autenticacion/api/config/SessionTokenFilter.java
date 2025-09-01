@@ -1,5 +1,7 @@
 package co.com.crediya.autenticacion.api.config;
 
+import co.com.crediya.autenticacion.model.sesion.Sesion;
+import co.com.crediya.autenticacion.usecase.sesion.SesionPermisoUrlUseCase;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -15,6 +17,7 @@ import reactor.core.publisher.Mono;
 public class SessionTokenFilter implements WebFilter {
 
     private final SesionRepository sesionRepository;
+    private final SesionPermisoUrlUseCase sesionPermisoUrlUseCase;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -31,14 +34,26 @@ public class SessionTokenFilter implements WebFilter {
         if (token == null || token.trim().isEmpty()) {
             return Mono.error(new CrediYautentiateException("No tienen permisos para este servicio"));
         }
-        
+
         // Validar el token y buscar la sesión
         return sesionRepository.buscarSesionPorToken(token)
+                .switchIfEmpty(Mono.error(new CrediYautentiateException("No tienen permisos para este servicio")))
+                .flatMap(sesion -> validarPermisoSesion(sesion, path))
                 .flatMap(sesion -> {
-                    // Agregar la sesión a los atributos del exchange
                     exchange.getAttributes().put("sesion", sesion);
                     return chain.filter(exchange);
-                })
-                .switchIfEmpty(Mono.error(new CrediYautentiateException("No tienen permisos para este servicio")));
+                });
     }
+
+    private Mono<Sesion> validarPermisoSesion(Sesion sesion, String path) {
+        return sesionPermisoUrlUseCase.getPermiso(sesion, path)
+                .flatMap(tienePermiso -> {
+                    if (Boolean.FALSE.equals(tienePermiso)) {
+                        return Mono.error(new CrediYautentiateException("No tienen permisos para este servicio"));
+                    }
+                    return Mono.just(sesion);
+                });
+    }
+
+
 }
