@@ -6,6 +6,7 @@ import co.com.crediya.autenticacion.model.usuario.gateways.UsuarioRepository;
 import co.com.crediya.autenticacion.usecase.sesion.LoginSesionUseCase;
 import co.com.crediya.autenticacion.usecase.sesion.SesionPermisoUrlUseCase;
 import co.com.crediya.autenticacion.usecase.usuario.RegistrarUsuarioUseCase;
+import co.com.crediya.autenticacion.usecase.usuario.UsuarioUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,11 @@ public class UseCasesConfig {
     @Bean
     public RegistrarUsuarioUseCase registrarUsuarioUseCase(UsuarioRepository usuarioRepository) {
         return new RegistrarUsuarioUseCase(usuarioRepository);
+    }
+
+    @Bean
+    public UsuarioUseCase usuarioUseCase(UsuarioRepository usuarioRepository) {
+        return new UsuarioUseCase(usuarioRepository);
     }
 
     @Bean

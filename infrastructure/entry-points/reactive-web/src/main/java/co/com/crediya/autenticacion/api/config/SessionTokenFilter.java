@@ -24,7 +24,7 @@ public class SessionTokenFilter implements WebFilter {
         String path = exchange.getRequest().getPath().value();
         
         // No aplicar el filtro para el endpoint de login
-        if ("/api/v1/login".equals(path)) {
+        if ("/api/v1/login".equals(path)  || path.contains("swagger") || path.contains("docs")) {
             return chain.filter(exchange);
         }
         
