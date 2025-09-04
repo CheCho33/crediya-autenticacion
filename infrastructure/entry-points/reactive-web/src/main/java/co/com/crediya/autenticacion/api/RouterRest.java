@@ -18,10 +18,13 @@ import co.com.crediya.autenticacion.model.sesion.Sesion;
 import co.com.crediya.autenticacion.model.usuario.dto.UsuarioLoginDto;
 import co.com.crediya.autenticacion.model.usuario.dto.UsuarioResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @Configuration
 public class RouterRest {
@@ -38,6 +41,16 @@ public class RouterRest {
                             description = "Registra un usuario en el sistema y retorna mensaje de éxito con los datos almacenados. " +
                                     "El usuario debe proporcionar nombre, apellido, email, documento de identidad, teléfono, rol y salario base.",
                             tags = {"Usuarios"},
+                            security = @SecurityRequirement(name = "x-token"),
+                            parameters = {
+                                    @Parameter(
+                                            name = "x-token",
+                                            in = ParameterIn.HEADER,
+                                            required = true,
+                                            description = "Token de autenticación para acceder al servicio",
+                                            schema = @Schema(type = "string", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+                                    )
+                            },
                             requestBody = @RequestBody(
                                     required = true, 
                                     description = "Datos del usuario a registrar",
@@ -52,6 +65,11 @@ public class RouterRest {
                                     @ApiResponse(
                                             responseCode = "400", 
                                             description = "Solicitud inválida - Datos faltantes o incorrectos",
+                                            content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
+                                    ),
+                                    @ApiResponse(
+                                            responseCode = "401", 
+                                            description = "No autorizado - Token inválido o expirado",
                                             content = @Content(schema = @Schema(implementation = ErrorResponseDto.class))
                                     ),
                                     @ApiResponse(
@@ -76,8 +94,18 @@ public class RouterRest {
                             operationId = "getUsuario",
                             summary = "Obtiene datos del usuario autenticado",
                             description = "Retorna los datos del usuario correspondiente a la sesión activa. " +
-                                    "Requiere autenticación mediante token en el header 'x-Token'.",
+                                    "Requiere autenticación mediante token en el header 'x-token'.",
                             tags = {"Usuarios"},
+                            security = @SecurityRequirement(name = "x-token"),
+                            parameters = {
+                                    @Parameter(
+                                            name = "x-token",
+                                            in = ParameterIn.HEADER,
+                                            required = true,
+                                            description = "Token de autenticación para acceder al servicio",
+                                            schema = @Schema(type = "string", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+                                    )
+                            },
                             responses = {
                                     @ApiResponse(
                                             responseCode = "200", 
@@ -111,7 +139,8 @@ public class RouterRest {
                             operationId = "loginUsuario",
                             summary = "Autentica un usuario y genera sesión",
                             description = "Valida las credenciales del usuario (email y contraseña) y genera una sesión activa " +
-                                    "con un token JWT válido por 24 horas. Si el usuario ya tiene una sesión activa, se reutiliza.",
+                                    "con un token JWT válido por 24 horas. Si el usuario ya tiene una sesión activa, se reutiliza. " +
+                                    "**NOTA: Este endpoint NO requiere autenticación previa.**",
                             tags = {"Autenticación"},
                             requestBody = @RequestBody(
                                     required = true, 
