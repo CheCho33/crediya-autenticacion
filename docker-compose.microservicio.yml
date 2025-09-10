@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  dbCrediya:
+    image: postgres:17
+    container_name: microservicio-dbCrediya
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: dbCrediYa
+    ports:
+      - "5438:5432"
+    volumes:
+      - /home/stabares/docker-volumes/credi-ya-pgdata:/var/lib/postgresql/data
+    restart: "no"
+    networks:
+      - credi-ya-network
+
+  # Microservicio de Autenticación
+  autenticacion:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: microservicio-autenticacion
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: "no"
+    networks:
+      - credi-ya-network
+    depends_on:
+      - dbCrediya
+
+  solicitudes:
+    build:
+      context: ../microservicio-solicitudes
+      dockerfile: Dockerfile
+    container_name: microservicio-solicitudes
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    restart: "no"
+    networks:
+      - credi-ya-network
+    depends_on:
+      - dbCrediya
+
+networks:
+  credi-ya-network:
+    driver: bridge
